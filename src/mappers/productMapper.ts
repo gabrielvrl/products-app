@@ -5,6 +5,7 @@ export interface ProductListItem {
   title: string;
   price: number;
   thumbnail: string;
+  rating: number;
 }
 
 export function mapProductToListItem(product: Product): ProductListItem {
@@ -13,6 +14,7 @@ export function mapProductToListItem(product: Product): ProductListItem {
     title: product.title,
     price: product.price,
     thumbnail: product.thumbnail,
+    rating: typeof product.rating === 'number' ? product.rating : 0,
   };
 }
 
