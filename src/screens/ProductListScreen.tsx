@@ -1,4 +1,17 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+} from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+  ProductDetail: { productId: number };
+};
+import { useToast } from 'contexts/Toast';
 import {
   SafeAreaView,
   Text,
@@ -23,25 +36,60 @@ import {
 } from '../mappers/productMapper';
 import { FilterModal } from 'components/FilterModal';
 
+type SortField = 'price' | 'rating' | null;
+type SortOrder = 'asc' | 'desc' | null;
+
 const PAGE_SIZE = 20;
 
+const normalizeCategory = (cat?: string | null) => {
+  if (!cat) return null;
+  return cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+};
+
 const ProductListScreen: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const route = useRoute();
+  const initialCategory = normalizeCategory(
+    (route.params && (route.params as any).categoryName) || null,
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    initialCategory,
+  );
   const [modalVisible, setModalVisible] = useState(false);
-  const [pendingCategory, setPendingCategory] = useState<string | null>(null);
-  type SortField = 'price' | 'rating';
-  type SortOrder = 'asc' | 'desc';
-  const [sortField, setSortField] = useState<SortField>('price');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [currentCategory, setCurrentCategory] = useState<string | null>(
+    initialCategory,
+  );
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
 
   const {
     data: categories,
-    isLoading: isLoadingCategories,
     isError: isErrorCategories,
+    isLoading: isLoadingCategories,
   } = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategories,
   });
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const toast = useToast();
+  const hasShownToastRef = useRef(false);
+
+  useEffect(() => {
+    if (isErrorCategories && !hasShownToastRef.current) {
+      toast.show({
+        title: 'Could not load categories',
+        message: 'Filtering may be limited.',
+        type: 'warning',
+        position: 'bottom',
+        autoDismiss: true,
+      });
+      hasShownToastRef.current = true;
+    }
+    if (!isErrorCategories) {
+      hasShownToastRef.current = false;
+    }
+  }, [isErrorCategories, toast]);
 
   const {
     data,
@@ -57,26 +105,26 @@ const ProductListScreen: React.FC = () => {
       fetchProducts({
         pageParam,
         limit: PAGE_SIZE,
-        category: selectedCategory || undefined,
-        sortBy: sortField,
-        order: sortOrder,
+        category: selectedCategory || null,
+        sortBy: sortField || null,
+        order: sortOrder || null,
       }),
     getNextPageParam: (lastPage, allPages) => {
       const loaded = allPages.flatMap(page => page.products || []).length;
-      return loaded < (lastPage.total || 0) ? loaded : undefined;
+      return loaded < (lastPage.total || 0) ? loaded : null;
     },
     initialPageParam: 0,
   });
 
   const handleCloseFilterModal = () => setModalVisible(false);
   const handleClearFilter = () => {
-    setPendingCategory(null);
+    setCurrentCategory(null);
   };
   const handleSelectCategory = (category: string) => {
-    setPendingCategory(prev => (prev === category ? null : category));
+    setCurrentCategory(prev => (prev === category ? null : category));
   };
   const handleSearch = () => {
-    setSelectedCategory(pendingCategory);
+    setSelectedCategory(currentCategory);
     setModalVisible(false);
   };
 
@@ -94,19 +142,24 @@ const ProductListScreen: React.FC = () => {
           <Text style={[Fonts.titleScreen, styles.titleScreen]}>Products</Text>
           <TouchableOpacity
             onPress={() => {
-              setPendingCategory(selectedCategory);
+              setCurrentCategory(selectedCategory);
               setModalVisible(true);
             }}
-            style={styles.filterButton}
+            style={[
+              styles.filterButton,
+              (isLoadingCategories || isErrorCategories) &&
+                styles.filterButtonDisabled,
+            ]}
+            disabled={isLoadingCategories || isErrorCategories}
           >
-            <Text style={[Fonts.contentBaseBold, { color: Colors.white }]}>
+            <Text style={[Fonts.contentBaseBold, styles.filterButtonText]}>
               Filter
             </Text>
           </TouchableOpacity>
         </View>
       </>
     ),
-    [selectedCategory],
+    [selectedCategory, isLoadingCategories, isErrorCategories],
   );
 
   const SortOptions = useCallback(
@@ -126,8 +179,13 @@ const ProductListScreen: React.FC = () => {
                 styles.sortButtonActive,
             ]}
             onPress={() => {
-              setSortField('price');
-              setSortOrder('asc');
+              if (sortField === 'price' && sortOrder === 'asc') {
+                setSortField(null);
+                setSortOrder(null);
+              } else {
+                setSortField('price');
+                setSortOrder('asc');
+              }
             }}
           >
             <Text
@@ -148,8 +206,13 @@ const ProductListScreen: React.FC = () => {
                 styles.sortButtonActive,
             ]}
             onPress={() => {
-              setSortField('price');
-              setSortOrder('desc');
+              if (sortField === 'price' && sortOrder === 'desc') {
+                setSortField(null);
+                setSortOrder(null);
+              } else {
+                setSortField('price');
+                setSortOrder('desc');
+              }
             }}
           >
             <Text
@@ -170,8 +233,13 @@ const ProductListScreen: React.FC = () => {
                 styles.sortButtonActive,
             ]}
             onPress={() => {
-              setSortField('rating');
-              setSortOrder('asc');
+              if (sortField === 'rating' && sortOrder === 'asc') {
+                setSortField(null);
+                setSortOrder(null);
+              } else {
+                setSortField('rating');
+                setSortOrder('asc');
+              }
             }}
           >
             <Text
@@ -192,8 +260,13 @@ const ProductListScreen: React.FC = () => {
                 styles.sortButtonActive,
             ]}
             onPress={() => {
-              setSortField('rating');
-              setSortOrder('desc');
+              if (sortField === 'rating' && sortOrder === 'desc') {
+                setSortField(null);
+                setSortOrder(null);
+              } else {
+                setSortField('rating');
+                setSortOrder('desc');
+              }
             }}
           >
             <Text
@@ -212,7 +285,7 @@ const ProductListScreen: React.FC = () => {
     [sortField, sortOrder],
   );
 
-  if (isError || isErrorCategories) {
+  if (isError) {
     return (
       <SafeAreaView style={CommonStyles.safeAreaContainer}>
         {Header()}
@@ -237,14 +310,14 @@ const ProductListScreen: React.FC = () => {
         categories={
           Array.isArray(categories) ? categories.map(c => c.name) : []
         }
-        selectedCategory={pendingCategory}
+        selectedCategory={currentCategory}
         handleCloseFilterModal={handleCloseFilterModal}
         onFilterClear={handleClearFilter}
         onSelectCategory={handleSelectCategory}
         onButtonOnePress={handleSearch}
       />
 
-      {isLoading || isLoadingCategories ? (
+      {isLoading ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" />
         </View>
@@ -253,14 +326,12 @@ const ProductListScreen: React.FC = () => {
           data={products}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => (
-            <View
-              style={[
-                styles.item,
-                {
-                  backgroundColor: Colors.almostWhite,
-                  borderRadius: Common.radiusBase,
-                },
-              ]}
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('ProductDetail', { productId: item.id })
+              }
+              activeOpacity={0.8}
+              style={styles.item}
             >
               <Image
                 source={{ uri: item.thumbnail }}
@@ -274,7 +345,8 @@ const ProductListScreen: React.FC = () => {
                   ${item.price}
                 </Text>
               </View>
-            </View>
+              <Text style={styles.chevron}>{'›'}</Text>
+            </TouchableOpacity>
           )}
           ListEmptyComponent={
             <View style={styles.centered}>
@@ -343,14 +415,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
     padding: 12,
+    backgroundColor: Colors.almostWhite,
+    borderRadius: Common.radiusBase,
     ...Common.dropShadow,
+  },
+  chevron: {
+    fontSize: 28,
+    color: Colors.gray,
+    marginLeft: 8,
+    alignSelf: 'center',
+    fontWeight: '300',
   },
   thumbnail: {
     width: 64,
     height: 64,
     borderRadius: 8,
     marginRight: 16,
-    backgroundColor: Colors.lightGray,
+    // backgroundColor: Colors.lightGray,
   },
   info: {
     flex: 1,
@@ -377,6 +458,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: Colors.primaryColor,
     borderRadius: 16,
+  },
+  filterButtonDisabled: {
+    opacity: 0.5,
+  },
+  filterButtonText: {
+    color: Colors.white,
   },
 });
 

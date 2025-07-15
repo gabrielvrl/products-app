@@ -12,9 +12,9 @@ export async function fetchProducts({
 }: {
   pageParam?: number;
   limit?: number;
-  category?: string;
-  sortBy?: 'price' | 'rating';
-  order?: 'asc' | 'desc';
+  category?: string | null;
+  sortBy?: 'price' | 'rating' | null;
+  order?: 'asc' | 'desc' | null;
 } = {}) {
   let url = `${API_BASE_URL}/products?skip=${pageParam}&limit=${limit}`;
   if (category) {
