@@ -6,7 +6,7 @@ const mockOnPress = jest.fn();
 
 const defaultProps: IIconButton = {
   onPress: mockOnPress,
-  source: require('assets/icons/info.png'),
+  source: require('assets/icons/toast_info.png'),
   testID: 'IconButton',
   imageTestID: 'Image',
 };

@@ -1,10 +1,5 @@
 import axios from 'axios';
-
-export interface Category {
-  slug: string;
-  name: string;
-  url: string;
-}
+import { Category } from 'types/Product';
 
 const API_BASE_URL = 'https://dummyjson.com';
 

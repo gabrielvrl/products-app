@@ -1,5 +1,4 @@
 import { Linking } from 'react-native';
-
 import { render } from '@testing-library/react-native';
 import { TextWithTag } from 'components';
 import { ITextWithTag } from '.';
@@ -9,9 +8,7 @@ const defaultProps: ITextWithTag = {
   style: {},
 };
 
-jest.mock('react-native/Libraries/Linking/Linking', () => ({
-  openURL: jest.fn(),
-}));
+jest.spyOn(Linking, 'openURL').mockImplementation(jest.fn());
 
 describe('TextWithTag Component (Native)', () => {
   const renderTextWithTags = (props?: Partial<ITextWithTag>) => {

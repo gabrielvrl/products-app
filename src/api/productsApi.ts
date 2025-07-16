@@ -16,16 +16,16 @@ export async function fetchProducts({
   sortBy?: 'price' | 'rating' | null;
   order?: 'asc' | 'desc' | null;
 } = {}) {
-  let url = `${API_BASE_URL}/products?skip=${pageParam}&limit=${limit}`;
-  if (category) {
-    url = `${API_BASE_URL}/products/category/${category}?skip=${pageParam}&limit=${limit}`;
-  }
-  const params: string[] = [];
-  if (sortBy) params.push(`sortBy=${sortBy}`);
-  if (order) params.push(`order=${order}`);
-  if (params.length) {
-    url += (url.includes('?') ? '&' : '?') + params.join('&');
-  }
-  const response = await axios.get<ProductApiResponse>(url);
+  const basePath = category
+    ? `/products/category/${encodeURIComponent(category)}`
+    : '/products';
+
+  const url = new URL(basePath, API_BASE_URL);
+  url.searchParams.set('skip', String(pageParam));
+  url.searchParams.set('limit', String(limit));
+  if (sortBy) url.searchParams.set('sortBy', sortBy);
+  if (order) url.searchParams.set('order', order);
+
+  const response = await axios.get<ProductApiResponse>(url.toString());
   return response.data;
 }

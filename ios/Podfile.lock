@@ -2212,6 +2212,40 @@ PODS:
     - React-perflogger (= 0.80.1)
     - React-utils (= 0.80.1)
     - SocketRocket
+  - RNNotifee (9.1.8):
+    - React-Core
+    - RNNotifee/NotifeeCore (= 9.1.8)
+  - RNNotifee/NotifeeCore (9.1.8):
+    - React-Core
+  - RNPermissions (5.4.1):
+    - boost
+    - DoubleConversion
+    - fast_float
+    - fmt
+    - glog
+    - hermes-engine
+    - RCT-Folly
+    - RCT-Folly/Fabric
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - SocketRocket
+    - Yoga
   - RNScreens (4.11.1):
     - boost
     - DoubleConversion
@@ -2350,6 +2384,8 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNNotifee (from `../node_modules/@notifee/react-native`)"
+  - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - SocketRocket (~> 0.7.1)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -2504,6 +2540,10 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNNotifee:
+    :path: "../node_modules/@notifee/react-native"
+  RNPermissions:
+    :path: "../node_modules/react-native-permissions"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   Yoga:
@@ -2582,10 +2622,12 @@ SPEC CHECKSUMS:
   ReactAppDependencyProvider: ba631a31783569c13056dd57ff39e19764abdd6f
   ReactCodegen: b16d00d43b4e9dc44af53be171b17d93b4b20267
   ReactCommon: 96684b90b235d6ae340d126141edd4563b7a446a
+  RNNotifee: 4a6ee5c7deaf00e005050052d73ee6315dff7ec9
+  RNPermissions: eb4bf20579ff15727be7892423099a9c0c579645
   RNScreens: 45a4564413205e2a1695d40bbc0297f6eefc9b74
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
   Yoga: daa1e4de4b971b977b23bc842aaa3e135324f1f3
 
 PODFILE CHECKSUM: 6365307091460738a24e692d8ed781afaf7d02fe
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

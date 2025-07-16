@@ -7,10 +7,6 @@ import React, {
 } from 'react';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-type RootStackParamList = {
-  ProductDetail: { productId: number };
-};
 import { useToast } from 'contexts/Toast';
 import {
   SafeAreaView,
@@ -30,21 +26,13 @@ import * as Colors from 'styles/Colors';
 import * as Common from 'styles/Common';
 import { fetchProducts } from '../api/productsApi';
 import { fetchCategories } from '../api/categoriesApi';
-import {
-  mapProductsToListItems,
-  ProductListItem,
-} from '../mappers/productMapper';
+import { mapProductsToListItems } from '../mappers/productMapper';
 import { FilterModal } from 'components/FilterModal';
-
-type SortField = 'price' | 'rating' | null;
-type SortOrder = 'asc' | 'desc' | null;
+import { ProductListItem, SortField, SortOrder } from 'types/Product';
+import { normalizeCategory } from 'utils/normalizeCategory';
+import { showProductNotification } from 'utils/notify';
 
 const PAGE_SIZE = 20;
-
-const normalizeCategory = (cat?: string | null) => {
-  if (!cat) return null;
-  return cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
-};
 
 const ProductListScreen: React.FC = () => {
   const route = useRoute();
@@ -54,10 +42,10 @@ const ProductListScreen: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(
     initialCategory,
   );
-  const [modalVisible, setModalVisible] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<string | null>(
     initialCategory,
   );
+  const [modalVisible, setModalVisible] = useState(false);
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>(null);
 
@@ -327,9 +315,10 @@ const ProductListScreen: React.FC = () => {
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() =>
-                navigation.navigate('ProductDetail', { productId: item.id })
-              }
+              onPress={() => {
+                showProductNotification(item.title, item.id);
+                navigation.navigate('ProductDetail', { productId: item.id });
+              }}
               activeOpacity={0.8}
               style={styles.item}
             >
@@ -431,7 +420,6 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 8,
     marginRight: 16,
-    // backgroundColor: Colors.lightGray,
   },
   info: {
     flex: 1,

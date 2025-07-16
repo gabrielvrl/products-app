@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Platform,
+  PermissionsAndroid,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
@@ -17,6 +18,7 @@ import * as Colors from 'styles/Colors';
 import { CommonStyles } from 'styles/CommonStyles';
 import { fetchProductDetail } from '../api/productDetailApi';
 import { IconButton } from 'components';
+import { addProductReminderToCalendar } from '../native/CalendarModule';
 
 interface ProductDetailParams {
   productId: number;
@@ -24,6 +26,7 @@ interface ProductDetailParams {
 
 const ProductDetailScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
+  const [calendarStatus, setCalendarStatus] = useState<string | null>(null);
   const route =
     useRoute<RouteProp<{ params: ProductDetailParams }, 'params'>>();
   const navigation = useNavigation();
@@ -59,6 +62,37 @@ const ProductDetailScreen: React.FC = () => {
     );
   }
 
+  const handleAddReminder = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR,
+        {
+          title: 'Calendar Permission',
+          message:
+            'App needs access to your calendar to add a purchase reminder.',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+        setCalendarStatus('Permission to access calendar was denied.');
+        return;
+      }
+    }
+    try {
+      await addProductReminderToCalendar(
+        product.title,
+        `Purchase reminder: ${product.title}`,
+        Date.now() + 24 * 60 * 60 * 1000,
+      );
+      setCalendarStatus('Reminder added to calendar!');
+    } catch (e: any) {
+      setCalendarStatus(
+        'Failed to add reminder: ' + (e?.message || 'Unknown error'),
+      );
+      console.log('Error adding reminder:', e);
+    }
+  };
+
   return (
     <SafeAreaView style={CommonStyles.safeAreaContainer}>
       <ScrollView contentContainerStyle={[styles.container, { paddingTop }]}>
@@ -78,6 +112,15 @@ const ProductDetailScreen: React.FC = () => {
             <Text style={styles.brand}>{product.brand}</Text>
             <Text style={styles.stock}>{product.stock} in stock</Text>
           </View>
+          <IconButton
+            testID="calendar-reminder"
+            source={require('../assets/icons/calendar.png')}
+            onPress={handleAddReminder}
+            customIconStyle={styles.calendarIcon}
+          />
+          {calendarStatus && (
+            <Text style={styles.calendarStatus}>{calendarStatus}</Text>
+          )}
           <View style={styles.ratingRow}>
             <Text style={styles.ratingLabel}>★</Text>
             <Text style={styles.ratingValue}>{product.rating}</Text>
@@ -216,8 +259,6 @@ const styles = StyleSheet.create({
     color: Colors.feedbackCritical,
     fontSize: 16,
   },
-  // ...
-  // ...
   reviewsSection: {
     width: '100%',
     marginTop: 8,
@@ -284,6 +325,15 @@ const styles = StyleSheet.create({
     ...Fonts.contentBase,
     textAlign: 'center',
     marginTop: 8,
+  },
+  calendarStatus: {
+    color: Colors.primaryColor,
+    marginTop: 8,
+  },
+  calendarIcon: {
+    width: 32,
+    height: 32,
+    marginTop: 12,
   },
 });
 

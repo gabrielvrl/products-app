@@ -1,3 +1,12 @@
+export type SortField = 'price' | 'rating' | null;
+export type SortOrder = 'asc' | 'desc' | null;
+
+export interface Category {
+  slug: string;
+  name: string;
+  url: string;
+}
+
 export interface ProductReview {
   rating: number;
   comment: string;
@@ -45,4 +54,12 @@ export interface ProductApiResponse {
   total: number;
   skip: number;
   limit: number;
+}
+
+export interface ProductListItem {
+  id: number;
+  title: string;
+  price: number;
+  thumbnail: string;
+  rating: number;
 }

@@ -1,12 +1,4 @@
-import { Product } from '../types/Product';
-
-export interface ProductListItem {
-  id: number;
-  title: string;
-  price: number;
-  thumbnail: string;
-  rating: number;
-}
+import { Product, ProductListItem } from '../types/Product';
 
 export function mapProductToListItem(product: Product): ProductListItem {
   return {

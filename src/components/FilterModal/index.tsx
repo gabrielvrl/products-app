@@ -78,8 +78,6 @@ const FilterModal: React.FC<IFilterModal> = ({
       </ScrollView>
     );
   };
-  // ...existing code...
-  // Remove duplicate/erroneous return and closing bracket here
 
   return (
     <Modal
