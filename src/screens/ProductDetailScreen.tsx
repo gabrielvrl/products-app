@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   SafeAreaView,
   Platform,
-  PermissionsAndroid,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
@@ -63,21 +62,6 @@ const ProductDetailScreen: React.FC = () => {
   }
 
   const handleAddReminder = async () => {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_CALENDAR,
-        {
-          title: 'Calendar Permission',
-          message:
-            'App needs access to your calendar to add a purchase reminder.',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        setCalendarStatus('Permission to access calendar was denied.');
-        return;
-      }
-    }
     try {
       await addProductReminderToCalendar(
         product.title,
@@ -87,9 +71,8 @@ const ProductDetailScreen: React.FC = () => {
       setCalendarStatus('Reminder added to calendar!');
     } catch (e: any) {
       setCalendarStatus(
-        'Failed to add reminder: ' + (e?.message || 'Unknown error'),
+        'Unable to add reminder. Please check your calendar permissions and try again.',
       );
-      console.log('Error adding reminder:', e);
     }
   };
 

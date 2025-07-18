@@ -3,17 +3,19 @@ import {
   NavigationContainer,
   useNavigationContainerRef,
 } from '@react-navigation/native';
-import RootNavigator from './routes/RootNavigator';
 import linking from './linking';
 import { StatusBar } from 'react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Colors } from './styles';
 import { ToastProvider } from 'contexts';
 import notifee, { EventType } from '@notifee/react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AppConfigWrapper from 'AppConfigWrapper';
 
 const queryClient = new QueryClient();
 
 export default function App() {
+  const Stack = createNativeStackNavigator();
   const navigationRef = useNavigationContainerRef<RootStackParamList>();
   const [initialProductId, setInitialProductId] = useState<number | null>(null);
   const hasNavigatedInitial = useRef(false);
@@ -68,7 +70,14 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <NavigationContainer linking={linking} ref={navigationRef}>
           <StatusBar barStyle="dark-content" backgroundColor={Colors.white} />
-          <RootNavigator />
+
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="Route" component={AppConfigWrapper} />
+          </Stack.Navigator>
         </NavigationContainer>
       </QueryClientProvider>
     </ToastProvider>
