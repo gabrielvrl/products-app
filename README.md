@@ -25,8 +25,11 @@ A cross-platform mobile application to browse, filter, and explore a catalog of 
 
 ## Screenshots
 
-![iPhone Home](./screenshots/iphone_home.png)
-![iPhone Product Details](./screenshots/iphone_product_details.png)
+<p align="center">
+  <img src="./screenshots/iphone_home.png" alt="iPhone Home" width="200"/>
+  &nbsp;&nbsp;
+  <img src="./screenshots/iphone_product_details.png" alt="iPhone Product Details" width="200"/>
+</p>
 
 ## Getting Started
 
