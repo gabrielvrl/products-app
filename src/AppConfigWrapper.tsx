@@ -1,6 +1,6 @@
 import React from 'react';
 import RootNavigator from 'routes/RootNavigator';
-import useAppStartupChecks from 'utils/useAppStartupChecks';
+import useAppStartupChecks from 'hooks/useAppStartupChecks';
 
 const AppConfig: React.FC = () => {
   useAppStartupChecks();
