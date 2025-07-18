@@ -42,6 +42,8 @@
 	</dict>
 	<key>NSCalendarsUsageDescription</key>
 	<string>We need calendar access to create reminders for your products.</string>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>We need full calendar access to create and manage reminders for your products.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>RCTNewArchEnabled</key>
