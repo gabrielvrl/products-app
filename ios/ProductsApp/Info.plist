@@ -40,6 +40,19 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- <key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+		<key>navigation</key>
+		<string>We need your location for turn-by-turn navigation.</string>
+		<key>delivery</key>
+		<string>We need your location to optimize delivery routes.</string>
+	</dict> -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need access to your location to provide personalized services.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We need access to your location to provide personalized services, even when the app is in the background.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need access to your location to provide personalized services.</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>We need calendar access to create reminders for your products.</string>
 	<key>NSCalendarsFullAccessUsageDescription</key>

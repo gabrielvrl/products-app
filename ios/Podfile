@@ -17,6 +17,9 @@ prepare_react_native_project!
 setup_permissions([
   'Calendars',
   'Notifications',
+  'LocationAccuracy',
+  'LocationAlways',
+  'LocationWhenInUse',
 ])
 
 linkage = ENV['USE_FRAMEWORKS']

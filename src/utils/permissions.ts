@@ -1,6 +1,56 @@
 import { Platform, PermissionsAndroid } from 'react-native';
-import { request, PERMISSIONS, RESULTS } from 'react-native-permissions';
+import { request, PERMISSIONS, RESULTS, check } from 'react-native-permissions';
 import notifee from '@notifee/react-native';
+
+export const requestLocationPermission = async () => {
+  console.log('Requesting location permission...');
+  if (Platform.OS === 'ios') {
+    const status = await request(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+    console.log('Location permission status:', status);
+    return status;
+  } else if (Platform.OS === 'android') {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION,
+    );
+    return granted === PermissionsAndroid.RESULTS.GRANTED
+      ? 'granted'
+      : 'denied';
+  }
+  return 'denied';
+};
+
+export const checkLocationPermission = async () => {
+  const permission =
+    Platform.OS === 'ios'
+      ? PERMISSIONS.IOS.LOCATION_WHEN_IN_USE
+      : PERMISSIONS.ANDROID.ACCESS_COARSE_LOCATION;
+
+  const result = await check(permission);
+
+  return result;
+};
+
+export async function getCountryFromCoords(
+  latitude: number,
+  longitude: number,
+): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+      {
+        headers: {
+          'User-Agent': 'ProductsApp/1.0 (your@email.com)',
+        },
+      },
+    );
+    const data = await response.json();
+    console.log('Reverse geocode data:', data);
+    return data.address?.country_code?.toUpperCase() || null;
+  } catch (e) {
+    console.error('Reverse geocode error:', e);
+    return null;
+  }
+}
 
 const requestCalendarPermission = async (show: (params: any) => void) => {
   if (Platform.OS === 'ios') {
